@@ -28,7 +28,9 @@ Send POST requests to URL that Flask provides.
 
 Send POST requests to `(base url)/zoomchatter`.
 
-Include one or more Zoom chat transcripts as "form-data" files. Any key can provided for each file; good values might be empty string ('') or 'chat'.
+Include one or more Zoom chat transcripts as "form-data" files. Any key can provided for each file; good keys might be empty string `` or `chat`, but any string is accepted.
+
+Multiple files are concatenated and treated as one.
 
 ## Notes and Considerations
 
