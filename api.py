@@ -6,7 +6,7 @@
 #
 ################################################################
 
-VERSION = 'v0.0.1'
+VERSION = 'v0.0.2'
 APPNAME = 'ZoomChatter'
 
 import re
@@ -21,17 +21,8 @@ from urlextract import URLExtract
 app = Flask(__name__)
 api = Api(app)
 
-# links
-# participants
-# clean
-# clean_grouped
-# clean_no_names
-
-# ?output=
-# ?flags=include_private
-# ?format=html (text (utf-8), ascii, markdown, HTML, JSON)
-
 def get_participants(input):
+    # doesn't work for chat formats with spaces rather than tabs
     participants = re.findall(r"^\d\d:\d\d:\d\d\t([^\t]+):\t", input, re.MULTILINE)
     return list(set(participants))
 
@@ -39,14 +30,6 @@ def get_links(input):
     extractor = URLExtract()
     urls = extractor.find_urls(input)
     return list(set(urls))
-
-def get_clean(input):
-    names_and_lines = re.findall(r"^\d\d:\d\d:\d\d\t([^\t]+):\t([^\n\r]*)", input, re.MULTILINE)
-    return names_and_lines
-
-def get_clean_no_names(input):
-    lines = re.findall(r"^\d\d:\d\d:\d\d\t[^\t]+:\t([^\n\r]*)", input, re.MULTILINE)
-    return "\n\n".join(lines)
 
 def get_lines(input):
     return input.splitlines()
@@ -57,6 +40,7 @@ class ZoomChatter(Resource):
         input = ''
         for key, file in request.files.items(multi=True):
             input += file.read().decode("utf-8")
+
         # change different possible linebreak characters to \n
         re.sub(r"[\n\r]|\u2028", "\n", input)
 
@@ -65,8 +49,6 @@ class ZoomChatter(Resource):
             'input_length': len(input),
             'participants': get_participants(input),
             'links': get_links(input),
-#            'clean': get_clean(input),
-#            'clean_no_names': get_clean_no_names(input),
             'lines': get_lines(input),
             'input_linebreaks_fixed': input,
         }
